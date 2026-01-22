@@ -2,10 +2,13 @@
 
 Local RAG system for querying Notion workspaces. Runs entirely on your machine using Ollama.
 
+![Open WebUI with self-notes](docs/assets/chat-ui.jpg)
+
 ## Requirements
 
 - Python 3.10+
 - [Ollama](https://ollama.com)
+
 
 ## Setup
 
@@ -88,8 +91,6 @@ Open WebUI will be available at `http://localhost:3000`.
    - URL: `http://host.docker.internal:8000/v1`
    - API Key: `any-value` (not validated)
 4. Select the `self-notes` model in your chat
-
-![Open WebUI with self-notes](docs/assets/chat-ui.jpg)
 
 ## Architecture
 

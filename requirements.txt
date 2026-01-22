@@ -1,0 +1,7 @@
+langchain>=0.1.0
+langchain-ollama>=0.1.0
+notion-client>=2.0.0
+python-dotenv>=1.0.0
+numpy>=1.24.0
+fastapi>=0.109.0
+uvicorn>=0.27.0

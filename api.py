@@ -3,21 +3,21 @@
 OpenAI-compatible API server for self-notes RAG system.
 Allows Open WebUI and other OpenAI-compatible clients to use the RAG pipeline.
 """
+
 import time
 import uuid
 import warnings
-from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from src.query import query
+from typing import Optional
 
 # Suppress pydantic v1 compatibility warning (langchain internal)
 warnings.filterwarnings("ignore", message=".*Pydantic V1.*")
 
-from src.query import query
-from src.config import LLM_MODEL
 
 app = FastAPI(title="Self-Notes RAG API", version="1.0.0")
 
@@ -88,9 +88,9 @@ async def list_models():
                 id="self-notes",
                 object="model",
                 created=int(time.time()),
-                owned_by="local"
+                owned_by="local",
             )
-        ]
+        ],
     )
 
 
@@ -130,7 +130,9 @@ async def chat_completions(request: ChatCompletionRequest):
                 "object": "chat.completion.chunk",
                 "created": created,
                 "model": "self-notes",
-                "choices": [{"index": 0, "delta": {"role": "assistant"}, "finish_reason": None}]
+                "choices": [
+                    {"index": 0, "delta": {"role": "assistant"}, "finish_reason": None}
+                ],
             }
             yield f"data: {json.dumps(role_chunk)}\n\n"
 
@@ -142,7 +144,13 @@ async def chat_completions(request: ChatCompletionRequest):
                     "object": "chat.completion.chunk",
                     "created": created,
                     "model": "self-notes",
-                    "choices": [{"index": 0, "delta": {"content": answer[i:i+chunk_size]}, "finish_reason": None}]
+                    "choices": [
+                        {
+                            "index": 0,
+                            "delta": {"content": answer[i : i + chunk_size]},
+                            "finish_reason": None,
+                        }
+                    ],
                 }
                 yield f"data: {json.dumps(content_chunk)}\n\n"
 
@@ -152,7 +160,7 @@ async def chat_completions(request: ChatCompletionRequest):
                 "object": "chat.completion.chunk",
                 "created": created,
                 "model": "self-notes",
-                "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}]
+                "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}],
             }
             yield f"data: {json.dumps(done_chunk)}\n\n"
             yield "data: [DONE]\n\n"
@@ -169,14 +177,14 @@ async def chat_completions(request: ChatCompletionRequest):
             ChatCompletionChoice(
                 index=0,
                 message=Message(role="assistant", content=answer),
-                finish_reason="stop"
+                finish_reason="stop",
             )
         ],
         usage=Usage(
             prompt_tokens=len(question.split()),
             completion_tokens=len(answer.split()),
-            total_tokens=len(question.split()) + len(answer.split())
-        )
+            total_tokens=len(question.split()) + len(answer.split()),
+        ),
     )
 
 
@@ -188,4 +196,5 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
